@@ -7,6 +7,18 @@ from src.numericalsolution.validation import validate_input
 
 
 def solve(f, lo, hi, eps_x, eps_y, method, settings={}):
+    """
+Solves the given equation in numerical way.
+
+    @param f: lambda representation of equation to be solved.
+    @param lo: Start of interval where you expect root.
+    @param hi: End of interval where you expect root.
+    @param eps_x: Precision by x-axis. If move in root occurred with new iteration is less than eps_x, iteration will break.
+    @param eps_y: Precision by y-axis. If move in y occurred with new iteration is less than eps_y, iteration will break.
+    @param method: Method to solve equation. Available 'bisections', 'chord', 'newton'
+    @param settings: Construct in progress, ignore.
+    @return: Response object
+    """
     err = validate_input(f, lo, hi, eps_x, eps_y)
     if err is not None:
         return generate_bad_response(err)

@@ -1,4 +1,4 @@
-from src.numericalsolution.main import solve
+from src.numericalsolution.numerical_solver import solve
 
 
 def main():

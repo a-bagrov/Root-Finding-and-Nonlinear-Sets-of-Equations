@@ -30,7 +30,10 @@ def parse_line(tuples_str, eps_x, eps_y, methods_to_use):
     tuple_list = list()
     for tuple_str in tuples_str.split('),'):
         if len(tuple_str) > 1:
-            tuple_list.append(make_tuple(tuple_str + ')'))
+            try:
+                tuple_list.append(make_tuple(tuple_str + ')'))
+            except Exception as e:
+                print(e)
 
     return NumericalSolver.solve_taw_with_methods(TupleArrayWrapper(tuple_list), eps_x, eps_y, methods_to_use)
 
@@ -59,11 +62,11 @@ class NumericalSolver:
 
         with concurrent.futures.ProcessPoolExecutor(max_workers=6) as executor:
             future_to_url = {executor.submit(parse_line, line, eps_x, eps_y, methods_to_use): line for
-                             line in lines}
+                             line in lines if line.startswith("F[(")}
             for future in concurrent.futures.as_completed(future_to_url):
                 resp_list.append(future.result())
 
-            return resp_list
+        return resp_list
 
 
     @staticmethod
@@ -104,7 +107,6 @@ class NumericalSolver:
         if not isinstance(data, DataWrapper):
             return NumericalSolver.__generate_bad_response(method, "Bad data parameter.")
 
-        data.clear_statistics()
         err = validate_input(data, lo, hi, eps_x, eps_y)
         if err is not None:
             return NumericalSolver.__generate_bad_response(method, err)
@@ -112,6 +114,7 @@ class NumericalSolver:
         if "DELTA_X_DERIVATE" not in settings:
             settings["DELTA_X_DERIVATE"] = math.DELTA_X_DERIVATE
 
+        data.clear_statistics()
         return NumericalSolver.__get_methods()[method](data, method, lo, hi, eps_x, eps_y, settings)
 
     @staticmethod
